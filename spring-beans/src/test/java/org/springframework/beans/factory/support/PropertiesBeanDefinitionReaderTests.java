@@ -25,6 +25,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Rob Harrop
+ * 解析 Properties 配置文件成对应的 BeanDefinition 们的流程
+ * 可调试 org.springframework.beans.factory.support.PropertiesBeanDefinitionReaderTests 这个单元测试里的方法。
  */
 public class PropertiesBeanDefinitionReaderTests {
 

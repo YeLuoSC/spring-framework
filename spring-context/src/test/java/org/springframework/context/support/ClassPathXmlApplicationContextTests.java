@@ -49,6 +49,9 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 /**
  * @author Juergen Hoeller
  * @author Chris Beams
+ * ③ ClassPathXmlApplicationContext 的流程
+ *
+ * 可调试 org.springframework.context.support.ClassPathXmlApplicationContextTests 这个单元测试类里的方法。例如 #testResourceAndInputStream() 方法。
  */
 public class ClassPathXmlApplicationContextTests {
 

@@ -288,12 +288,17 @@ configure(allprojects) { project ->
 			maven { url "https://repo.spring.io/snapshot" } // Reactor
 		}
 	}
-	configurations.all {
-		resolutionStrategy {
-			cacheChangingModulesFor 0, "seconds"
-			cacheDynamicVersionsFor 0, "seconds"
+	allprojects {
+		repositories {
+			maven{ url 'http://maven.aliyun.com/nexus/content/groups/public'}
 		}
 	}
+//	configurations.all {
+//		resolutionStrategy {
+//			cacheChangingModulesFor 0, "seconds"
+//			cacheDynamicVersionsFor 0, "seconds"
+//		}
+//	}
 }
 
 configure([rootProject] + javaProjects) { project ->

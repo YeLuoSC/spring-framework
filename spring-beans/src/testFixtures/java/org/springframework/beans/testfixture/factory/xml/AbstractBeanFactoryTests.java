@@ -44,6 +44,11 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Sam Brannen
+ * ② 加载 Bean 的流程
+ *
+ * 可调试 org.springframework.beans.factory.xml.AbstractBeanFactoryTests 这个单元测试类里的方法。
+ *
+ * 实际上，AbstractBeanFactoryTests 是一个抽象类，所以在运行时，需要选择对应的子类，例如 XmlListableBeanFactoryTests 类。
  */
 public abstract class AbstractBeanFactoryTests {
 

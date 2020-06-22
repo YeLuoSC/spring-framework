@@ -38,6 +38,10 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  * @author Rick Evans
  * @author Juergen Hoeller
  * @author Sam Brannen
+ * ① 解析 XML 配置文件成对应的 BeanDefinition 们的流程
+ * 可调试 org.springframework.beans.factory.xml.XmlBeanDefinitionReaderTests 的 #withFreshInputStream() 和 #withImport() 这两个单元测试。
+ *
+ * 相比来说，后者比前者多了一个 <import /> 标签的解析。当然，XmlBeanDefinitionReaderTests 类中，其它方法也可以简单调试下。看胖友的兴趣哈。
  */
 public class XmlBeanDefinitionReaderTests {
 

@@ -27,6 +27,9 @@ import org.springframework.util.StringUtils;
  * @since 3.0
  * @see Class#getResource(String)
  * @see ClassPathResource#ClassPathResource(String, Class)
+ * ClassRelativeResourceLoader 扩展的功能是，可以根据给定的class 所在包或者所在包的子包下加载资源。
+ * ClassRelativeResourceLoader的构造器接收一个class，意思是将从传入的class所在路径或子路径下加载资源
+ * https://blog.csdn.net/seasonsbin/article/details/80914911
  */
 public class ClassRelativeResourceLoader extends DefaultResourceLoader {
 
