@@ -292,6 +292,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * @Author xieguannan
 	 * @Description 非 "classpath*:" 开头，且路径不包含通配符，直接委托给相应的 ResourceLoader 来实现。
 	 * 其他情况，调用 #findAllClassPathResources(...)、或 #findPathMatchingResources(...) 方法，返回多个 Resource
+	 * classpath*:表示查找classpath路径下的所有符合条件的资源，包含jar、zip等资源；classpath:表示优先在项目的资源目录下查找，找不到才去jar、zip等资源中查找
 	 * @Date 19:20 2020/6/22
 	 * @Param [locationPattern]
 	 * @return org.springframework.core.io.Resource[]
@@ -301,9 +302,10 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 		Assert.notNull(locationPattern, "Location pattern must not be null");
 		if (locationPattern.startsWith(CLASSPATH_ALL_URL_PREFIX)) {
 			// 以 "classpath*:" 开头
+			//判断是查找多个文件还是单个，即判断是否含有*或者?
 			// a class path resource (multiple resources for same name possible)
 			if (getPathMatcher().isPattern(locationPattern.substring(CLASSPATH_ALL_URL_PREFIX.length()))) {
-				// 路径包含通配符
+				// 路径包含通配符，递归查找根目录
 				// a class path resource pattern
 				return findPathMatchingResources(locationPattern);
 			}
@@ -539,6 +541,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 			rootDirResource = resolveRootDirResource(rootDirResource);
 			URL rootDirUrl = rootDirResource.getURL();
 			// bundle 资源类型
+			//判断是否含有协议为bundle的资源，没有则返回原值
 			if (equinoxResolveMethod != null && rootDirUrl.getProtocol().startsWith("bundle")) {
 				URL resolvedUrl = (URL) ReflectionUtils.invokeMethod(equinoxResolveMethod, null, rootDirUrl);
 				if (resolvedUrl != null) {
