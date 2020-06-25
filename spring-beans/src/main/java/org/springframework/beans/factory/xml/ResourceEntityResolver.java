@@ -50,6 +50,7 @@ import org.springframework.lang.Nullable;
  * @since 31.07.2003
  * @see org.springframework.core.io.ResourceLoader
  * @see org.springframework.context.ApplicationContext
+ * 继承自 DelegatingEntityResolver 类，通过 ResourceLoader 来解析实体的引用。
  */
 public class ResourceEntityResolver extends DelegatingEntityResolver {
 
@@ -70,18 +71,35 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 	}
 
 
+	/**
+	 * @Author xieguannan
+	 * @Description
+	 * EntityResolver.resolveEntity接口方法接收两个参数 publicId 和 systemId ，并返回 InputSource 对象。两个参数声明如下：
+	 * publicId ：被引用的外部实体的公共标识符，如果没有提供，则返回 null 。
+	 * systemId ：被引用的外部实体的系统标识符。
+	 *
+	 * XSD 验证模式
+	 * publicId：null
+	 * systemId：http://www.springframework.org/schema/beans/spring-beans.xsd
+	 *
+	 * DTD 验证模式
+	 * publicId：-//SPRING//DTD BEAN 2.0//EN
+	 * systemId：http://www.springframework.org/dtd/spring-beans.dtd
+	 */
 	@Override
 	@Nullable
 	public InputSource resolveEntity(@Nullable String publicId, @Nullable String systemId)
 			throws SAXException, IOException {
-
+		// 调用父类的方法，进行解析
 		InputSource source = super.resolveEntity(publicId, systemId);
-
+		// 解析失败，resourceLoader 进行解析
 		if (source == null && systemId != null) {
+			// 获得 resourcePath ，即 Resource 资源地址
 			String resourcePath = null;
 			try {
 				String decodedSystemId = URLDecoder.decode(systemId, "UTF-8");
 				String givenUrl = new URL(decodedSystemId).toString();
+				// 解析文件资源的相对路径（相对于系统根路径）
 				String systemRootUrl = new File("").toURI().toURL().toString();
 				// Try relative to resource base if currently in system root.
 				if (givenUrl.startsWith(systemRootUrl)) {

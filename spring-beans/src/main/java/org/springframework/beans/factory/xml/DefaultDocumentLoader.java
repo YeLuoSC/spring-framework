@@ -68,12 +68,14 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	@Override
 	public Document loadDocument(InputSource inputSource, EntityResolver entityResolver,
 			ErrorHandler errorHandler, int validationMode, boolean namespaceAware) throws Exception {
-
+		// <1> 创建 DocumentBuilderFactory
 		DocumentBuilderFactory factory = createDocumentBuilderFactory(validationMode, namespaceAware);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Using JAXP provider [" + factory.getClass().getName() + "]");
 		}
+		// <2> 创建 DocumentBuilder
 		DocumentBuilder builder = createDocumentBuilder(factory, entityResolver, errorHandler);
+		// <3> 解析 XML InputSource 返回 Document 对象
 		return builder.parse(inputSource);
 	}
 
@@ -87,7 +89,6 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	 */
 	protected DocumentBuilderFactory createDocumentBuilderFactory(int validationMode, boolean namespaceAware)
 			throws ParserConfigurationException {
-
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(namespaceAware);
 
@@ -127,11 +128,13 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	protected DocumentBuilder createDocumentBuilder(DocumentBuilderFactory factory,
 			@Nullable EntityResolver entityResolver, @Nullable ErrorHandler errorHandler)
 			throws ParserConfigurationException {
-
+		// 创建 DocumentBuilder 对象
 		DocumentBuilder docBuilder = factory.newDocumentBuilder();
+		// <x> 设置 EntityResolver 属性
 		if (entityResolver != null) {
 			docBuilder.setEntityResolver(entityResolver);
 		}
+		// 设置 ErrorHandler 属性
 		if (errorHandler != null) {
 			docBuilder.setErrorHandler(errorHandler);
 		}

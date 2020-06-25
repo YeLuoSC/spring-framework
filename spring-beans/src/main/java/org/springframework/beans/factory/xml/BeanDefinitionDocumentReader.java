@@ -41,7 +41,7 @@ public interface BeanDefinitionDocumentReader {
 	 * register them with the registry in the given reader context.
 	 * @param doc the DOM document
 	 * @param readerContext the current context of the reader
-	 * (includes the target registry and the resource being parsed)
+	 * (includes the target registry and the resource being parsed)包括目标注册表和被解析的资源。
 	 * @throws BeanDefinitionStoreException in case of parsing errors
 	 */
 	void registerBeanDefinitions(Document doc, XmlReaderContext readerContext)

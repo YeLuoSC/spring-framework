@@ -35,6 +35,7 @@ import org.springframework.util.Assert;
  * @since 2.0
  * @see BeansDtdResolver
  * @see PluggableSchemaResolver
+ * 实现 EntityResolver 接口，分别代理 dtd 的 BeansDtdResolver 和 xml schemas 的 PluggableSchemaResolver
  */
 public class DelegatingEntityResolver implements EntityResolver {
 
@@ -81,7 +82,8 @@ public class DelegatingEntityResolver implements EntityResolver {
 	@Nullable
 	public InputSource resolveEntity(@Nullable String publicId, @Nullable String systemId)
 			throws SAXException, IOException {
-
+		//如果是 DTD 验证模式，则使用 BeansDtdResolver 来进行解析
+		//如果是 XSD 验证模式，则使用 PluggableSchemaResolver 来进行解析
 		if (systemId != null) {
 			if (systemId.endsWith(DTD_SUFFIX)) {
 				return this.dtdResolver.resolveEntity(publicId, systemId);

@@ -81,27 +81,31 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	/**
 	 * Indicates that the validation should be disabled.
 	 */
+	// 禁用验证模式
 	public static final int VALIDATION_NONE = XmlValidationModeDetector.VALIDATION_NONE;
 
 	/**
 	 * Indicates that the validation mode should be detected automatically.
 	 */
+	// 自动获取验证模式
 	public static final int VALIDATION_AUTO = XmlValidationModeDetector.VALIDATION_AUTO;
 
 	/**
 	 * Indicates that DTD validation should be used.
 	 */
+	// DTD 验证模式
 	public static final int VALIDATION_DTD = XmlValidationModeDetector.VALIDATION_DTD;
 
 	/**
 	 * Indicates that XSD validation should be used.
 	 */
+	// XSD 验证模式
 	public static final int VALIDATION_XSD = XmlValidationModeDetector.VALIDATION_XSD;
 
 
 	/** Constants instance for this class. */
 	private static final Constants constants = new Constants(XmlBeanDefinitionReader.class);
-
+	//验证模式。默认为自动模式。
 	private int validationMode = VALIDATION_AUTO;
 
 	private boolean namespaceAware = false;
@@ -263,15 +267,20 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	/**
 	 * Return the EntityResolver to use, building a default resolver
 	 * if none specified.
+	 * 返回指定的解析器，如果没有指定，则构造一个未指定的默认解析器。
+	 * EntityResolver.resolveEntity接口方法接收两个参数 publicId 和 systemId ，并返回 InputSource 对象。两个参数声明如下：
+	 *
+	 * publicId ：被引用的外部实体的公共标识符，如果没有提供，则返回 null 。
+	 * systemId ：被引用的外部实体的系统标识符。
 	 */
 	protected EntityResolver getEntityResolver() {
 		if (this.entityResolver == null) {
 			// Determine default EntityResolver to use.
 			ResourceLoader resourceLoader = getResourceLoader();
-			if (resourceLoader != null) {
+			if (resourceLoader != null) {//如果 ResourceLoader 不为 null，则根据指定的 ResourceLoader 创建一个 ResourceEntityResolver 对象
 				this.entityResolver = new ResourceEntityResolver(resourceLoader);
 			}
-			else {
+			else {//如果 ResourceLoader 为 null ，则创建 一个 DelegatingEntityResolver 对象。该 Resolver 委托给默认的 BeansDtdResolver 和 PluggableSchemaResolver 。
 				this.entityResolver = new DelegatingEntityResolver(getBeanClassLoader());
 			}
 		}
@@ -435,10 +444,19 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @throws Exception when thrown from the DocumentLoader
 	 * @see #setDocumentLoader
 	 * @see DocumentLoader#loadDocument
+	 * 在 loadDocument 方法中涉及一个参数 EntityResolver ，何为EntityResolver？官网这样解释：如果 SAX 应用程序需要实现自定义
+	 * 处理外部实体，则必须实现此接口并使用 setEntityResolver 方法向SAX 驱动器注册一个实例。也就是说，对于解析一个XML，SAX 首先
+	 * 读取该 XML 文档上的声明，根据声明去寻找相应的 DTD 定义，以便对文档进行一个验证。默认的寻找规则，即通过网络（实现上就是声明的
+	 * DTD的URI地址）来下载相应的DTD声明，并进行认证。下载的过程是一个漫长的过程，而且当网络中断或不可用时，这里会报错，就是因为相应
+	 * 的DTD声明没有被找到的原因。
+	 *
+	 * EntityResolver 的作用是项目本身就可以提供一个如何寻找 DTD 声明的方法，即由程序来实现寻找 DTD 声明的过程，比如我们将 DTD 文
+	 * 件放到项目中某处，在实现时直接将此文档读取并返回给 SAX 即可。这样就避免了通过网络来寻找相应的声明。
 	 */
 	protected Document doLoadDocument(InputSource inputSource, Resource resource) throws Exception {
 		return this.documentLoader.loadDocument(inputSource, getEntityResolver(), this.errorHandler,
 				getValidationModeForResource(resource), isNamespaceAware());
+				//获取指定资源（xml）的验证模式
 	}
 
 	/**
@@ -450,14 +468,18 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see #detectValidationMode
 	 */
 	protected int getValidationModeForResource(Resource resource) {
+		// <1> 获取指定的验证模式
 		int validationModeToUse = getValidationMode();
+		// 首先，如果手动指定，则直接返回
 		if (validationModeToUse != VALIDATION_AUTO) {
 			return validationModeToUse;
 		}
+		// 其次，自动获取验证模式
 		int detectedMode = detectValidationMode(resource);
 		if (detectedMode != VALIDATION_AUTO) {
 			return detectedMode;
 		}
+		// 最后，使用 VALIDATION_XSD 做为默认
 		// Hmm, we didn't get a clear indication... Let's assume XSD,
 		// since apparently no DTD declaration has been found up until
 		// detection stopped (before finding the document's root tag).
@@ -472,6 +494,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * of the {@link #VALIDATION_AUTO} mode.
 	 */
 	protected int detectValidationMode(Resource resource) {
+		// 资源如果被inputstream读取过了，抛出 BeanDefinitionStoreException 异常
 		if (resource.isOpen()) {
 			throw new BeanDefinitionStoreException(
 					"Passed-in Resource [" + resource + "] contains an open stream: " +
@@ -490,7 +513,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 					"Did you attempt to load directly from a SAX InputSource without specifying the " +
 					"validationMode on your XmlBeanDefinitionReader instance?", ex);
 		}
-
+		// <x> 获取相应的验证模式
 		try {
 			return this.validationModeDetector.detectValidationMode(inputStream);
 		}
@@ -530,6 +553,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * reading bean definitions from an XML document.
 	 * <p>The default implementation instantiates the specified "documentReaderClass".
 	 * @see #setDocumentReaderClass
+	 * documentReaderClass 的默认值为 DefaultBeanDefinitionDocumentReader.class
 	 */
 	protected BeanDefinitionDocumentReader createBeanDefinitionDocumentReader() {
 		return BeanUtils.instantiateClass(this.documentReaderClass);
