@@ -21,7 +21,7 @@ import org.springframework.lang.Nullable;
 /**
  * Interface to be implemented by bean metadata elements
  * that carry a configuration source object.
- *
+ * Bean 元对象持有的配置元素可以通过 #getSource()方法来获取
  * @author Juergen Hoeller
  * @since 2.0
  */
