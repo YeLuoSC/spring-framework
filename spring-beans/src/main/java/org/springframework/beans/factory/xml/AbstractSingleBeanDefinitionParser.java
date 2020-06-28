@@ -44,6 +44,16 @@ import org.springframework.lang.Nullable;
  * @see #getBeanClass
  * @see #getBeanClassName
  * @see #doParse
+ * 定义一个 Parser 类，该类继承 AbstractSingleBeanDefinitionParser ，并实现 #getBeanClass(Element element) 和
+ * #doParse(Element element, BeanDefinitionBuilder builder) 两个方法。主要是用于解析 XSD 文件中的定义和组件定义。
+ *
+ * 扩展 Spring 自定义标签配置一般需要以下几个步骤：
+ *
+ * 创建一个需要扩展的组件。
+ * 定义一个 XSD 文件，用于描述组件内容。
+ * 创建一个实现 org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser 接口的类，用来解析 XSD 文件中的定义和组件定义。
+ * 创建一个 Handler，继承 org.springframework.beans.factory.xml.NamespaceHandlerSupport 抽象类 ，用于将组件注册到 Spring 容器。
+ * 编写 spring.handlers 和 Spring.schemas 文件。
  */
 public abstract class AbstractSingleBeanDefinitionParser extends AbstractBeanDefinitionParser {
 
@@ -60,22 +70,28 @@ public abstract class AbstractSingleBeanDefinitionParser extends AbstractBeanDef
 	 */
 	@Override
 	protected final AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
+		// 创建 BeanDefinitionBuilder 对象
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition();
+		// 获取父类元素
 		String parentName = getParentName(element);
 		if (parentName != null) {
 			builder.getRawBeanDefinition().setParentName(parentName);
 		}
+		// 获取自定义标签中的 class，这个时候会去调用自定义解析中的 getBeanClass()
 		Class<?> beanClass = getBeanClass(element);
 		if (beanClass != null) {
 			builder.getRawBeanDefinition().setBeanClass(beanClass);
 		}
 		else {
+			// beanClass 为 null，意味着子类并没有重写 getBeanClass() 方法，则尝试去判断是否重写了 getBeanClassName()
 			String beanClassName = getBeanClassName(element);
 			if (beanClassName != null) {
 				builder.getRawBeanDefinition().setBeanClassName(beanClassName);
 			}
 		}
+		// 设置 source 属性
 		builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
+		// 设置 scope 属性
 		BeanDefinition containingBd = parserContext.getContainingBeanDefinition();
 		if (containingBd != null) {
 			// Inner bean definition must receive same scope as containing bean.
@@ -85,6 +101,7 @@ public abstract class AbstractSingleBeanDefinitionParser extends AbstractBeanDef
 			// Default-lazy-init applies to custom bean definitions as well.
 			builder.setLazyInit(true);
 		}
+		// 调用子类的 doParse() 进行解析
 		doParse(element, parserContext, builder);
 		return builder.getBeanDefinition();
 	}
