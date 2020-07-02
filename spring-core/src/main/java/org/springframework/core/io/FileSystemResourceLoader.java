@@ -58,6 +58,7 @@ public class FileSystemResourceLoader extends DefaultResourceLoader {
 	/**
 	 * FileSystemResource that explicitly expresses a context-relative path
 	 * through implementing the ContextResource interface.
+	 * 通过嵌套类，在getResourceByPath返回上层接口的实现类，达到隐藏这个内部类的目的
 	 */
 	private static class FileSystemContextResource extends FileSystemResource implements ContextResource {
 
